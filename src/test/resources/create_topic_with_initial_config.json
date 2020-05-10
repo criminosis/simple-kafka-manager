@@ -1,0 +1,10 @@
+{
+  "version": "v1",
+  "topicStates": {
+    "intialConfigTopic": {
+      "config": {
+        "min.insync.replicas": "2"
+      }
+    }
+  }
+}

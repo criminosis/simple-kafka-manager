@@ -196,6 +196,14 @@ public class KafkaStateV1IT {
     }
 
     @Test
+    public void createTopicWithInitialConfig() throws ExecutionException, InterruptedException {
+        runFile("create_topic_with_initial_config.json");
+        String topicName = "intialConfigTopic";
+        assertReplicaAndPartitions(topicName, 1, 1);
+        assertTopicConfiguration(topicName, Map.of(TopicConfig.MIN_IN_SYNC_REPLICAS_CONFIG, "2"));
+    }
+
+    @Test
     public void alterTopicConfig() throws ExecutionException, InterruptedException {
         runFile("alter_config_step1.json");
         String topicName = "alterConfigTopic";
