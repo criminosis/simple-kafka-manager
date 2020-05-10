@@ -1,0 +1,8 @@
+{
+  "version": "v1",
+  "topicStates": {
+    "simpleTopicMultipleReplicas": {
+      "initialReplicationFactor": 3
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "version": "v1",
+  "topicStates": {
+    "alterConfigTopic": {
+      "config": {
+        "min.insync.replicas": "2",
+        "compression.type": "zstd",
+        "retention.ms": "1337"
+      }
+    }
+  }
+}
