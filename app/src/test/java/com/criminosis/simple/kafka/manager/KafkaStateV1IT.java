@@ -43,7 +43,7 @@ import static org.junit.Assert.fail;
 public class KafkaStateV1IT {
 
     @ClassRule
-    public static final GenericContainer zookeeper = createZookeeperContainer();
+    public static final GenericContainer<?> zookeeper = createZookeeperContainer();
 
     private static List<KafkaContainer> kafkaCluster;
 
@@ -282,10 +282,9 @@ public class KafkaStateV1IT {
         return () -> KafkaStateV1IT.class.getClassLoader().getResourceAsStream(resourceToOpen);
     }
 
-    private static GenericContainer createZookeeperContainer() {
-        GenericContainer zookeeper = new GenericContainer<>("zookeeper:3.6.0")
+    private static GenericContainer<?> createZookeeperContainer() {
+        return new GenericContainer<>("zookeeper:3.6.0")
                 .withNetwork(Network.SHARED)
                 .withNetworkAliases("zookeeper");
-        return zookeeper;
     }
 }
