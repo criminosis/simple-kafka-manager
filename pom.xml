@@ -61,6 +61,14 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.1.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>com.criminosis.simple.kafka.manager.Main</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-deploy-plugin</artifactId>
@@ -75,6 +83,8 @@
                 <configuration>
                     <release>${maven.compiler.target}</release>
                     <compilerArgs>
+                        <arg>--module-path</arg>
+                        <arg>${project.build.directory}/modules</arg>
                         <arg>-Xlint:all,-options,-path</arg>
                     </compilerArgs>
                 </configuration>
@@ -138,23 +148,167 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            <!--            <plugin>-->
+            <!--                <groupId>org.apache.maven.plugins</groupId>-->
+            <!--                <artifactId>maven-shade-plugin</artifactId>-->
+            <!--                <version>3.2.3</version>-->
+            <!--                <executions>-->
+            <!--                    <execution>-->
+            <!--                        <goals>-->
+            <!--                            <goal>shade</goal>-->
+            <!--                        </goals>-->
+            <!--                        <configuration>-->
+            <!--                            <shadedArtifactAttached>true</shadedArtifactAttached>-->
+            <!--                            <transformers>-->
+            <!--                                <transformer implementation=-->
+            <!--                                                     "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">-->
+            <!--                                    <mainClass>com.criminosis.simple.kafka.manager.Main</mainClass>-->
+            <!--                                </transformer>-->
+            <!--                            </transformers>-->
+            <!--                        </configuration>-->
+            <!--                    </execution>-->
+            <!--                </executions>-->
+            <!--            </plugin>-->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.3</version>
+                <groupId>org.moditect</groupId>
+                <artifactId>moditect-maven-plugin</artifactId>
+                <version>1.0.0.Beta2</version>
                 <executions>
                     <execution>
+                        <id>add-module-info-to-dependencies</id>
+                        <phase>package</phase>
                         <goals>
-                            <goal>shade</goal>
+                            <goal>add-module-info</goal>
                         </goals>
                         <configuration>
-                            <shadedArtifactAttached>true</shadedArtifactAttached>
-                            <transformers>
-                                <transformer implementation=
-                                                     "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.criminosis.simple.kafka.manager.Main</mainClass>
-                                </transformer>
-                            </transformers>
+                            <jvmVersion>11</jvmVersion>
+                            <outputDirectory>${project.build.directory}/modules</outputDirectory>
+                            <module>
+                                <mainClass>com.criminosis.simple.kafka.manager.Main</mainClass>
+                                <moduleInfo>
+                                    <name>com.criminosis.simple.kafka.manager</name>
+                                    <exports>
+                                        com.criminosis.simple.kafka.manager to com.fasterxml.jackson.databind;
+                                    </exports>
+                                    <opens>com.criminosis.simple.kafka.manager to com.fasterxml.jackson.databind
+                                    </opens>
+                                </moduleInfo>
+                            </module>
+<!--                            <modules>-->
+                                <!--These don't have a module-info.java but using the jdeps integration we can generate them-->
+                                <!--                                <module>-->
+                                <!--                                    <artifact>-->
+                                <!--                                        <groupId>org.hamcrest</groupId>-->
+                                <!--                                        <artifactId>hamcrest-core</artifactId>-->
+                                <!--                                    </artifact>-->
+                                <!--                                    <moduleInfo>-->
+                                <!--                                        <name>hamcrest.core</name>-->
+                                <!--                                        <exports>org.hamcrest to logback.core</exports>-->
+                                <!--                                        <exports>org.hamcrest to com.github.luben.zstd_jni</exports>-->
+                                <!--                                        <exports>org.hamcrest to logback.classic</exports>-->
+                                <!--                                        <exports>org.hamcrest to logback.core</exports>-->
+                                <!--                                    </moduleInfo>-->
+                                <!--                                </module>-->
+                                <!--                                <module>-->
+                                <!--                                    <artifact>-->
+                                <!--                                        <groupId>org.hamcrest</groupId>-->
+                                <!--                                        <artifactId>hamcrest-library</artifactId>-->
+                                <!--                                    </artifact>-->
+                                <!--                                    <moduleInfo>-->
+                                <!--                                        <name>hamcrest.library</name>-->
+                                <!--                                        <exports>org.hamcrest to logback.core</exports>-->
+                                <!--                                        <exports>org.hamcrest to com.github.luben.zstd_jni</exports>-->
+                                <!--                                        <exports>org.hamcrest to logback.classic</exports>-->
+                                <!--                                        <exports>org.hamcrest to logback.core</exports>-->
+                                <!--                                    </moduleInfo>-->
+                                <!--                                </module>-->
+<!--                            </modules>-->
+                            <modules>
+<!--                                <module>-->
+<!--                                    <artifact>-->
+<!--                                        <groupId>org.slf4j</groupId>-->
+<!--                                        <artifactId>slf4j-api</artifactId>-->
+<!--                                    </artifact>-->
+<!--                                    <moduleInfo>-->
+<!--                                        <name>org.slf4j</name>-->
+<!--                                    </moduleInfo>-->
+<!--                                </module>-->
+                                <module>
+                                    <artifact>
+                                        <groupId>org.apache.kafka</groupId>
+                                        <artifactId>kafka-clients</artifactId>
+                                    </artifact>
+                                    <moduleInfo>
+                                        <name>kafka.clients</name>
+                                    </moduleInfo>
+                                </module>
+                                <module>
+                                    <artifact>
+                                        <groupId>com.fasterxml.jackson.core</groupId>
+                                        <artifactId>jackson-core</artifactId>
+                                    </artifact>
+                                    <moduleInfo>
+                                        <name>com.fasterxml.jackson.core</name>
+                                    </moduleInfo>
+                                </module>
+                                <module>
+                                    <artifact>
+                                        <groupId>com.fasterxml.jackson.core</groupId>
+                                        <artifactId>jackson-annotations</artifactId>
+                                    </artifact>
+                                    <moduleInfo>
+                                        <name>com.fasterxml.jackson.annotations</name>
+                                    </moduleInfo>
+                                </module>
+                                <module>
+                                    <artifact>
+                                        <groupId>com.fasterxml.jackson.core</groupId>
+                                        <artifactId>jackson-databind</artifactId>
+                                    </artifact>
+                                    <moduleInfo>
+                                        <name>com.fasterxml.jackson.databind</name>
+                                    </moduleInfo>
+                                </module>
+<!--                                <module>-->
+<!--                                    <artifact>-->
+<!--                                        <groupId>org.awaitility</groupId>-->
+<!--                                        <artifactId>awaitility</artifactId>-->
+<!--                                    </artifact>-->
+<!--                                    <moduleInfo>-->
+<!--                                        <name>awaitility</name>-->
+<!--                                    </moduleInfo>-->
+<!--                                </module>-->
+                            </modules>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>create-runtime-image</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>create-runtime-image</goal>
+                        </goals>
+                        <configuration>
+                            <modulePath>
+                                <path>${project.build.directory}/modules</path>
+                            </modulePath>
+                            <modules>
+                                <module>com.criminosis.simple.kafka.manager</module>
+                            </modules>
+                            <!--
+                            <excludedResources>
+                                <pattern>glob:/com.example/**</pattern>
+                            </excludedResources>
+                            -->
+                            <!-- TODO: Check out jmod for setting this up for other platform targets
+                            <baseJdk>version=11,vendor=openjdk,platform=linux-x64</baseJdk>
+                            -->
+                            <launcher>
+                                <name>simple-kafka-manager</name>
+                                <module>com.criminosis.simple.kafka.manager</module>
+                            </launcher>
+                            <outputDirectory>
+                                ${project.build.directory}/jlink-image
+                            </outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -166,7 +320,8 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.11.0</version>
+            <!-- Temporary downgrade to version sans module-info.java -->
+            <version>2.9.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
@@ -177,23 +332,45 @@
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
             <version>3.1.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hamcrest</groupId>
+                    <artifactId>hamcrest-library</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.hamcrest</groupId>
+                    <artifactId>hamcrest-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.3</version>
+            <version>1.3.0-alpha5</version>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
             <version>${testcontainers.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hamcrest</groupId>
+                    <artifactId>hamcrest-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>kafka</artifactId>
             <version>${testcontainers.version}</version>
             <scope>test</scope>
+        </dependency>
+        <!-- Not test, evidently Awaitility requires it as a compile dependency time -->
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+            <version>2.2</version>
         </dependency>
     </dependencies>
 </project>
