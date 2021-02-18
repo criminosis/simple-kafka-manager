@@ -21,7 +21,7 @@ jobs:
       - name: Rename the artifact to OS-unique name
         shell: bash
         run: |
-          value=`cp build/graal/checksum build/graal/checksum-${{ matrix.os }}`
+          value=`cp build/graal/simple-kafka-manager build/graal/simple-kafka-manager-${{ matrix.os }}`
       - name: Publish artifact
         uses: actions/upload-artifact@master
         with:
