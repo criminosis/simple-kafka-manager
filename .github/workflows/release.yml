@@ -1,0 +1,68 @@
+on:
+  push:
+    branches:
+      - master
+
+name: Upload Release Assets
+
+jobs:
+  release-ubuntu-mac:
+    name: Upload Release Asset
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macOS-latest ]
+
+    steps:
+      - uses: actions/checkout@v2
+      #Needed to push release commits, sets up a settings.xml file
+      - name: Setup Java JDK
+        uses: actions/setup-java@v1.4.2
+        with:
+          java-version: 11
+          server-id: github
+      - name: Configure Git user
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+      - uses: DeLaGuardo/setup-graalvm@master
+        with:
+          graalvm-version: '21.0.0.2.java11'
+      - run: java -version
+      - run: gu install native-image
+      - name: Build Release with Maven Wrapper
+        run: ./mvnw -B -ntp release:prepare release:perform -Darguments="-DskipTests=true"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Rename the artifact to OS-unique name
+        shell: bash
+        run: |
+          value=`cp target/simple-kafka-manager target/simple-kafka-manager-${{ matrix.os }}`
+      - name: Publish artifact
+        uses: actions/upload-artifact@master
+        with:
+          name: simple-kafka-manager-${{ matrix.os }}
+          path: target/simple-kafka-manager-${{ matrix.os }}
+          if-no-files-found: error
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`.
+          # See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: target/simple-kafka-manager-${{ matrix.os }}
+          asset_name: simple-kafka-manager-${{ matrix.os }}
+          asset_content_type: application/octet-stream
