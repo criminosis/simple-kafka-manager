@@ -16,7 +16,7 @@ jobs:
           graalvm-version: '19.3.0.2.java11'
       - run: java -version
       - run: gu install native-image
-      - name: Build with Gradle
+      - name: Build with Maven Wrapper
         run: ./mvnw verify
       - name: Rename the artifact to OS-unique name
         shell: bash
@@ -44,7 +44,7 @@ jobs:
       - name: Set up Visual C Build Tools Workload for Visual Studio 2017 Build Tools
         run: |
           choco install visualstudio2017-workload-vctools
-      - name: set env variables and run the Gradle build
+      - name: set env variables and run the Maven Wrapper build
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
