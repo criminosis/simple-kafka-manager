@@ -3,32 +3,41 @@ package com.criminosis.simple.kafka.manager;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
+import java.util.concurrent.Callable;
 
-public class Main {
+//TODO it'd be nice if we could inject the version via reading the manifest file
+@CommandLine.Command(name = "simple-kafka-manager", mixinStandardHelpOptions = true, version = "Simple Kafka Manager TBD",
+        description = "Processes the specified state file upon the targeted Kafka cluster")
+public class Main implements Callable<Integer> {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
+    @CommandLine.Parameters(index = "0", description = "The state file URL (for example \"file:/path/to/state.json\")")
+    private URL stateUrl;
+
+    @CommandLine.Parameters(index = "1", description = "The targeted kafka cluster's \"bootstrap.servers\"")
+    private String boostrapServers;
+
     public static void main(String[] args) throws MalformedURLException {
-        if (args.length < 2) {
-            fail("Expected \"bootstrap.servers\" and a URL to kafka state file (for example \"file:/path/to/state.json\"");
-        }
+        int exitCode = new CommandLine(new Main()).execute(args);
+        System.exit(exitCode);
+    }
 
-        String boostrapServers = args[0];
-        if (boostrapServers.isBlank()) {
+    private static void fail(String reason) {
+        logger.error(reason);
+        throw new IllegalArgumentException(reason);
+    }
+
+    @Override
+    public Integer call() throws Exception {
+        if (boostrapServers == null || boostrapServers.isBlank()) {
             fail("Blank bootstrap servers" + boostrapServers);
-        }
-
-        URL stateUrl;
-        try {
-            stateUrl = new URL(args[1]);
-        } catch (MalformedURLException e) {
-            logger.error("Malformed kafka state file url", e);
-            throw e;
         }
 
         Properties kafkaProps = new Properties();
@@ -40,10 +49,6 @@ public class Main {
                 throw new UncheckedIOException(e);
             }
         }).run();
-    }
-
-    private static void fail(String reason) {
-        logger.error(reason);
-        throw new IllegalArgumentException(reason);
+        return 0;
     }
 }
