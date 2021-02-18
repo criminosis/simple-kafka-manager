@@ -6,12 +6,13 @@ on:
 name: Upload Release Assets
 
 jobs:
+  #Linux build will handle the full release, the later MacOS is just to make the MacOS binary and upload it
   release-ubuntu-mac:
     name: Upload Release Asset
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, macOS-latest ]
+        os: [ ubuntu-latest]
 
     steps:
       - uses: actions/checkout@v2
@@ -55,6 +56,47 @@ jobs:
           draft: false
           prerelease: false
       - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`.
+          # See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: target/simple-kafka-manager-${{ matrix.os }}
+          asset_name: simple-kafka-manager-${{ matrix.os }}
+          asset_content_type: application/octet-stream
+
+  #Just does a build and assume nothing is modified relative to the Linux build
+  #TODO this would recreate the build though with the post-release snapshot?
+  release-mac:
+    name: Upload Release Asset
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ macOS-latest ]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: DeLaGuardo/setup-graalvm@master
+        with:
+          graalvm-version: '21.0.0.2.java11'
+      - run: java -version
+      - run: gu install native-image
+      - name: MacOs Build Release with Maven Wrapper
+        run: ./mvnw -B -ntp verify
+      - name: Rename the artifact to MacOS Name
+        shell: bash
+        run: |
+          value=`cp target/simple-kafka-manager target/simple-kafka-manager-${{ matrix.os }}`
+      - name: Publish MacOS artifact
+        uses: actions/upload-artifact@master
+        with:
+          name: simple-kafka-manager-${{ matrix.os }}
+          path: target/simple-kafka-manager-${{ matrix.os }}
+          if-no-files-found: error
+      - name: Upload MacOS Release Asset
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
