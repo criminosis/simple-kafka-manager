@@ -10,7 +10,10 @@
 
     <properties>
         <mainClass>com.criminosis.simple.kafka.manager.Main</mainClass>
-        <graal.nativeImageBuildArgs>--no-fallback -H:+ReportExceptionStackTraces</graal.nativeImageBuildArgs>
+        <graal.nativeImageBuildArgs>--no-fallback --allow-incomplete-classpath
+            --add-exports=java.base/jdk.internal.module=ALL-UNNAMED -H:+ReportExceptionStackTraces
+            -H:+ReportUnsupportedElementsAtRuntime
+        </graal.nativeImageBuildArgs>
         <graal.version>19.3.0.2</graal.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
@@ -179,8 +182,6 @@
                     <imageName>${project.name}</imageName>
                     <mainClass>${mainClass}</mainClass>
                     <buildArgs>${graal.nativeImageBuildArgs}</buildArgs>
-                    <!--          <buildArgs>-J&#45;&#45;add-exports=java.base/jdk.internal.module=ALL-UNNAMED</buildArgs>-->
-                    <!--          <buildArgs>-H:+ReportUnsupportedElementsAtRuntime &#45;&#45;allow-incomplete-classpath</buildArgs>-->
                 </configuration>
                 <executions>
                     <execution>
