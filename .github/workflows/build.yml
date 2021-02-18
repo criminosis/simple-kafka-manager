@@ -18,6 +18,9 @@ jobs:
       - run: gu install native-image
       - name: Build with Maven Wrapper
         run: ./mvnw -B -ntp verify
+      - name: Show artifacts
+        shell: bash
+        run: ls target
       - name: Rename the artifact to OS-unique name
         shell: bash
         run: |
