@@ -7,7 +7,7 @@ name: Upload Release Assets
 
 jobs:
   #Linux build will handle the full release, the later MacOS is just to make the MacOS binary and upload it
-  release-ubuntu-mac:
+  release-ubuntu:
     name: Upload Release Asset
     runs-on: ${{ matrix.os }}
     strategy:
@@ -71,6 +71,7 @@ jobs:
   #Just does a build and assume nothing is modified relative to the Linux build
   #TODO this would recreate the build though with the post-release snapshot?
   release-mac:
+    needs: release-ubuntu
     name: Upload Release Asset
     runs-on: ${{ matrix.os }}
     strategy:
