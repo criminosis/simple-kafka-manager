@@ -27,6 +27,7 @@ jobs:
         with:
           name: simple-kafka-manager-${{ matrix.os }}
           path: target/simple-kafka-manager-${{ matrix.os }}
+          if-no-files-found: error
 
 #TODO we'll come back to this later
 #  build-windows:
