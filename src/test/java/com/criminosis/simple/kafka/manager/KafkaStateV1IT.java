@@ -14,10 +14,10 @@ import org.apache.kafka.common.config.ConfigResource;
 import org.apache.kafka.common.config.TopicConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.Network;
@@ -39,18 +39,23 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.condition.OS.MAC;
 
+//Github Actions MacOS does not support docker
+//https://github.com/actions/virtual-environments/issues/17
+//possible work around: https://github.com/marketplace/actions/setup-docker
+@DisabledOnOs(MAC)
 public class KafkaStateV1IT {
 
-    @ClassRule
     public static final GenericContainer zookeeper = createZookeeperContainer();
 
     private static List<KafkaContainer> kafkaCluster;
 
     private static Properties kafkaProps;
 
-    @BeforeClass
-    public static void afterZKIsReady() {
+    @BeforeAll
+    static void afterZKIsReady() {
+        zookeeper.start();
         kafkaCluster = IntStream.range(0, 3)
                 .mapToObj(brokerId ->
                         new KafkaContainer("5.4.2")
@@ -70,13 +75,14 @@ public class KafkaStateV1IT {
         kafkaProps.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapConfig);
     }
 
-    @AfterClass
-    public static void cleanup() {
+    @AfterAll
+    static void cleanup() {
         kafkaCluster.forEach(GenericContainer::stop);
+        zookeeper.stop();
     }
 
     @Test
-    public void simpleCreateAndDelete() throws ExecutionException, InterruptedException {
+    void simpleCreateAndDelete() throws ExecutionException, InterruptedException {
         runFile("simple_create_and_delete_step1.json");
         assertReplicaAndPartitions("simpleTopicToDelete", 1, 1);
         runFile("simple_create_and_delete_step2.json");
@@ -87,25 +93,25 @@ public class KafkaStateV1IT {
     }
 
     @Test
-    public void simpleCreateMultiplePartitions() throws ExecutionException, InterruptedException {
+    void simpleCreateMultiplePartitions() throws ExecutionException, InterruptedException {
         runFile("simple_create_multiple_partitions.json");
         assertReplicaAndPartitions("simpleTopicMultiplePartitions", 3, 1);
     }
 
     @Test
-    public void simpleCreateMultipleReplicas() throws ExecutionException, InterruptedException {
+    void simpleCreateMultipleReplicas() throws ExecutionException, InterruptedException {
         runFile("simple_create_multiple_replicas.json");
         assertReplicaAndPartitions("simpleTopicMultipleReplicas", 1, 3);
     }
 
     @Test
-    public void simpleCreate() throws ExecutionException, InterruptedException {
+    void simpleCreate() throws ExecutionException, InterruptedException {
         runFile("simple_create.json");
         assertReplicaAndPartitions("simpleTopic", 1, 1);
     }
 
     @Test
-    public void reassignTopicPartitionsAndReplicaCounts() throws ExecutionException, InterruptedException {
+    void reassignTopicPartitionsAndReplicaCounts() throws ExecutionException, InterruptedException {
         runFile("reassign_partitions_step1.json");
         String topicName = "reassignAndReplicasPartitions";
         try (Admin admin = createAdmin()) {
@@ -129,7 +135,7 @@ public class KafkaStateV1IT {
     }
 
     @Test
-    public void increasePartitions() throws ExecutionException, InterruptedException {
+    void increasePartitions() throws ExecutionException, InterruptedException {
         runFile("increase_partitions_step1.json");
         String topicName = "increasePartitionsTopic";
         assertReplicaAndPartitions(topicName, 2, 1);
@@ -142,7 +148,7 @@ public class KafkaStateV1IT {
     }
 
     @Test
-    public void changeReplicaCount() throws ExecutionException, InterruptedException {
+    void changeReplicaCount() throws ExecutionException, InterruptedException {
         runFile("increase_replica_step1.json");
         String topicName = "increaseReplicaTopic";
         assertPartitionAssignments(topicName, Map.of(
@@ -159,7 +165,7 @@ public class KafkaStateV1IT {
     }
 
     @Test
-    public void createAndRecreate() throws ExecutionException, InterruptedException {
+    void createAndRecreate() throws ExecutionException, InterruptedException {
         runFile("topic_recreate_step1.json");
         String topicName = "topicToRecreate";
         assertReplicaAndPartitions(topicName, 1, 1);
@@ -196,7 +202,7 @@ public class KafkaStateV1IT {
     }
 
     @Test
-    public void createTopicWithInitialConfig() throws ExecutionException, InterruptedException {
+    void createTopicWithInitialConfig() throws ExecutionException, InterruptedException {
         runFile("create_topic_with_initial_config.json");
         String topicName = "intialConfigTopic";
         assertReplicaAndPartitions(topicName, 1, 1);
@@ -204,7 +210,7 @@ public class KafkaStateV1IT {
     }
 
     @Test
-    public void alterTopicConfig() throws ExecutionException, InterruptedException {
+    void alterTopicConfig() throws ExecutionException, InterruptedException {
         runFile("alter_config_step1.json");
         String topicName = "alterConfigTopic";
         assertReplicaAndPartitions(topicName, 1, 1);

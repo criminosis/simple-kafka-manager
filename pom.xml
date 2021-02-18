@@ -9,10 +9,17 @@
     <version>0.1-SNAPSHOT</version>
 
     <properties>
+        <mainClass>com.criminosis.simple.kafka.manager.Main</mainClass>
+        <graal.nativeImageBuildArgs>--no-fallback --allow-incomplete-classpath
+            -H:+ReportExceptionStackTraces -H:+ReportUnsupportedElementsAtRuntime
+        </graal.nativeImageBuildArgs>
+        <graal.version>21.0.0.2</graal.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <testcontainers.version>1.14.1</testcontainers.version>
+        <testcontainers.version>1.15.2</testcontainers.version>
+        <picocli.version>4.6.1</picocli.version>
+        <junit.version>5.7.1</junit.version>
     </properties>
 
     <developers>
@@ -73,9 +80,17 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>info.picocli</groupId>
+                            <artifactId>picocli-codegen</artifactId>
+                            <version>${picocli.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                     <release>${maven.compiler.target}</release>
                     <compilerArgs>
                         <arg>-Xlint:all,-options,-path</arg>
+                        <arg>-Aproject=${project.groupId}/${project.artifactId}</arg>
                     </compilerArgs>
                 </configuration>
                 <dependencies>
@@ -159,6 +174,24 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.graalvm.nativeimage</groupId>
+                <artifactId>native-image-maven-plugin</artifactId>
+                <version>${graal.version}</version>
+                <configuration>
+                    <imageName>${project.name}</imageName>
+                    <mainClass>${mainClass}</mainClass>
+                    <buildArgs>${graal.nativeImageBuildArgs}</buildArgs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>native-image</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -179,6 +212,11 @@
             <version>3.1.1</version>
         </dependency>
         <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli</artifactId>
+            <version>${picocli.version}</version>
+        </dependency>
+        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.2.3</version>
@@ -193,6 +231,18 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>kafka</artifactId>
             <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
