@@ -19,6 +19,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <testcontainers.version>1.15.2</testcontainers.version>
         <picocli.version>4.6.1</picocli.version>
+        <junit.version>5.7.1</junit.version>
     </properties>
 
     <developers>
@@ -230,6 +231,18 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>kafka</artifactId>
             <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
