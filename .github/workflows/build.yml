@@ -25,7 +25,7 @@ jobs:
       - name: Publish artifact
         uses: actions/upload-artifact@master
         with:
-          name: checksum-${{ matrix.os }}
+          name: simple-kafka-manager-${{ matrix.os }}
           path: target/simple-kafka-manager-${{ matrix.os }}
 
 #TODO we'll come back to this later
