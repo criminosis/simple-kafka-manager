@@ -14,7 +14,7 @@
             --add-exports=java.base/jdk.internal.module=ALL-UNNAMED -H:+ReportExceptionStackTraces
             -H:+ReportUnsupportedElementsAtRuntime
         </graal.nativeImageBuildArgs>
-        <graal.version>19.3.0.2</graal.version>
+        <graal.version>21.0.0.2</graal.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
