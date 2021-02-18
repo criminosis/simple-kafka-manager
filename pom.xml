@@ -11,8 +11,7 @@
     <properties>
         <mainClass>com.criminosis.simple.kafka.manager.Main</mainClass>
         <graal.nativeImageBuildArgs>--no-fallback --allow-incomplete-classpath
-            --add-exports=java.base/jdk.internal.module=ALL-UNNAMED -H:+ReportExceptionStackTraces
-            -H:+ReportUnsupportedElementsAtRuntime
+            -H:+ReportExceptionStackTraces -H:+ReportUnsupportedElementsAtRuntime
         </graal.nativeImageBuildArgs>
         <graal.version>21.0.0.2</graal.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
