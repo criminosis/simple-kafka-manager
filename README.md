@@ -78,9 +78,7 @@ by a step 2 showing how topic configs can be modified.
 
 ## How To Use
 
-This application requires at least Java 11 to compile and run
-
-1. Clone this repo
-2. Run `mvn package`
-4. Run the shaded jar and provide the kafka bootstrap servers string and then the URL to the kafka state file.
-    1. Example: `java -jar .\target\simple-kafka-manager-0.1-SNAPSHOT-shaded.jar broker1:9092,broker2:9092,broker3:9092 file:/kafka_state.json`
+1. Download the latest release from the releases section for your platform
+2. Make the downloaded binary executable. A known limitation of [github actions](https://github.com/actions/upload-artifact#permission-loss)
+3. Run the binary and provide the kafka bootstrap servers string and then the URL to the kafka state file.
+   1. Example: `./simple-kafka-manager-[platformName]-latest broker1:9092,broker2:9092,broker3:9092 file:/kafka_state.json`
