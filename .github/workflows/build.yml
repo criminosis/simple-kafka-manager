@@ -7,7 +7,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest]
+        os: [ubuntu-latest] #TODO add back macOS-latest
 
     steps:
       - uses: actions/checkout@v2
@@ -28,33 +28,34 @@ jobs:
           name: checksum-${{ matrix.os }}
           path: build/graal
 
-  build-windows:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-latest]
-
-    steps:
-      - uses: actions/checkout@v2
-      - uses: DeLaGuardo/setup-graalvm@master
-        with:
-          graalvm-version: '21.0.0.2.java11'
-      - run: java -version
-      - name: Set up Visual C Build Tools Workload for Visual Studio 2017 Build Tools
-        run: |
-          choco install visualstudio2017-workload-vctools
-      - name: set env variables and run the Maven Wrapper build
-        shell: cmd
-        run: |
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
-          ./mvnw -B -ntp verify
-      - name: Rename the artifact to OS-unique name
-        shell: bash
-        run: |
-          value=`cp build/graal/checksum build/graal/checksum-${{ matrix.os }}`
-      - name: Publish artifact
-        uses: actions/upload-artifact@master
-        with:
-          name: checksum-${{ matrix.os }}.exe
-          path: build/graal
+#TODO we'll come back to this later
+#  build-windows:
+#    runs-on: ${{ matrix.os }}
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        os: [windows-latest]
+#
+#    steps:
+#      - uses: actions/checkout@v2
+#      - uses: DeLaGuardo/setup-graalvm@master
+#        with:
+#          graalvm-version: '21.0.0.2.java11'
+#      - run: java -version
+#      - name: Set up Visual C Build Tools Workload for Visual Studio 2017 Build Tools
+#        run: |
+#          choco install visualstudio2017-workload-vctools
+#      - name: set env variables and run the Maven Wrapper build
+#        shell: cmd
+#        run: |
+#          call "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
+#          ./mvnw -B -ntp verify
+#      - name: Rename the artifact to OS-unique name
+#        shell: bash
+#        run: |
+#          value=`cp build/graal/checksum build/graal/checksum-${{ matrix.os }}`
+#      - name: Publish artifact
+#        uses: actions/upload-artifact@master
+#        with:
+#          name: checksum-${{ matrix.os }}.exe
+#          path: build/graal
