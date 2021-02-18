@@ -18,18 +18,15 @@ jobs:
       - run: gu install native-image
       - name: Build with Maven Wrapper
         run: ./mvnw -B -ntp verify
-      - name: Show artifacts
-        shell: bash
-        run: ls target
       - name: Rename the artifact to OS-unique name
         shell: bash
         run: |
-          value=`cp build/graal/simple-kafka-manager build/graal/simple-kafka-manager-${{ matrix.os }}`
+          value=`cp target/simple-kafka-manager target/simple-kafka-manager-${{ matrix.os }}`
       - name: Publish artifact
         uses: actions/upload-artifact@master
         with:
           name: checksum-${{ matrix.os }}
-          path: build/graal
+          path: target
 
 #TODO we'll come back to this later
 #  build-windows:
