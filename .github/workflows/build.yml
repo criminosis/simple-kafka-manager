@@ -26,7 +26,7 @@ jobs:
         uses: actions/upload-artifact@master
         with:
           name: checksum-${{ matrix.os }}
-          path: target
+          path: target/simple-kafka-manager-${{ matrix.os }}`
 
 #TODO we'll come back to this later
 #  build-windows:
