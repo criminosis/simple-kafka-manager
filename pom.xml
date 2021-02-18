@@ -4,7 +4,7 @@
 
     <groupId>org.example</groupId>
     <artifactId>simple-kafka-manager</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.2</version>
 
     <properties>
         <mainClass>com.criminosis.simple.kafka.manager.Main</mainClass>
@@ -35,7 +35,7 @@
         <connection>scm:git:git@github.com:criminosis/simple-kafka-manager.git</connection>
         <developerConnection>scm:git:https://github.com/criminosis/simple-kafka-manager.git</developerConnection>
         <url>https://github.com/criminosis/simple-kafka-manager</url>
-        <tag>HEAD</tag>
+        <tag>simple-kafka-manager-0.2</tag>
     </scm>
 
     <build>
