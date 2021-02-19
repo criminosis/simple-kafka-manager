@@ -13,6 +13,9 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest]
+    outputs:
+      release_url: ${{ steps.create_release.outputs.upload_url }}
+      build_version: ${{ steps.get_release_version.outputs.build_version }}
 
     steps:
       - uses: actions/checkout@v2
@@ -31,6 +34,11 @@ jobs:
           graalvm-version: '21.0.0.2.java11'
       - run: java -version
       - run: gu install native-image
+      - name: Get Release Version
+        shell: bash
+        run: |
+          - raw="::set-output name=build_version::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)"
+          - echo "${raw/-SNAPSHOT/}"
       - name: Build Release with Maven Wrapper
         run: ./mvnw -B -ntp release:prepare release:perform -Darguments="-DskipTests=true"
         env:
@@ -51,8 +59,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ steps.get_release_version.outputs.build_version }}
+          release_name: Release ${{ steps.get_release_version.outputs.build_version }}
           draft: false
           prerelease: false
       - name: Upload Release Asset
@@ -69,7 +77,6 @@ jobs:
           asset_content_type: application/octet-stream
 
   #Just does a build and assume nothing is modified relative to the Linux build
-  #TODO this would recreate the build though with the post-release snapshot?
   release-mac:
     needs: release-ubuntu
     name: Upload Release Asset
@@ -103,9 +110,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`.
-          # See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{needs.release-ubuntu.outputs.release_url}}
           asset_path: target/simple-kafka-manager-${{ matrix.os }}
           asset_name: simple-kafka-manager-${{ matrix.os }}
           asset_content_type: application/octet-stream
