@@ -114,5 +114,5 @@ jobs:
         with:
           upload_url: ${{needs.release-ubuntu.outputs.release_url}}
           asset_path: target/simple-kafka-manager-${{ matrix.os }}
-          asset_name: simple-kafka-manager-${{ steps.get_release_version.outputs.build_version }}-${{ matrix.os }}
+          asset_name: simple-kafka-manager-${{needs.release-ubuntu.outputs.build_version}}-${{ matrix.os }}
           asset_content_type: application/octet-stream
