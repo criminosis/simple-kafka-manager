@@ -35,8 +35,12 @@ jobs:
       - run: java -version
       - run: gu install native-image
       - name: Get Release Version
+        id: get_release_version
         shell: bash
         run: ./set_release_version.sh
+      - name: Show Release Version
+        shell: bash
+        run: echo ${{ steps.get_release_version.outputs.build_version }}
       - name: Build Release with Maven Wrapper
         run: ./mvnw -B -ntp release:prepare release:perform -Darguments="-DskipTests=true"
         env:
